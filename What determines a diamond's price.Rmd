@@ -1,0 +1,60 @@
+---
+title: "Exercise 2"
+author: "Xiangkai Wang"
+date: "28 July 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(ggplot2)
+library(dplyr)
+Diamonds <- read.csv("Diamonds.csv")
+Diamonds$cut<- factor(Diamonds$cut, levels=c('Fair','Good','Very Good','Premium','Ideal'), 
+                       ordered=TRUE)
+Diamonds$color<- factor(Diamonds$color, levels=c('J','I','H','G','F','E','D'), 
+                         ordered=TRUE)
+Diamonds$clarity<- factor(Diamonds$clarity, levels=c('I1','SI2','SI1','VS2','VS1','VVS2','VVS1','IF'), 
+                           ordered=TRUE)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+p1 <- ggplot(Diamonds, aes(cut, price)) + geom_boxplot() +
+  stat_summary(fun.y = mean, color = "red", geom = "point")
+p1
+
+p2 <- qplot(x = carat, y = table, data = Diamonds, color = color
+            ,geom = "point") +
+  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm",
+              se = FALSE)
+p2
+
+p3 <- ggplot(Diamonds, aes(x = clarity, y = price, color = cut)) + 
+  geom_boxplot() + 
+  facet_grid(color~., margins = TRUE) 
+p3
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+p4 <- ggplot(diamonds_mp_by_color, aes(x=color, y=mean_price, fill=color)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_brewer(palette="Set2") + 
+  guides(fill = guide_legend(ncol=2, title.hjust=0.4))
+p4
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

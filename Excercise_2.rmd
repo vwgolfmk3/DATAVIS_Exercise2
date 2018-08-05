@@ -1,0 +1,51 @@
+---
+title: 'Chapter 2 Exercise: A Grammar for Data Visualisation'
+author: "Xiangkai Wang (s3509521)"
+date: "5 August 2018"
+output: html_document
+---
+
+## Loading Libraries and Cleansing Diamond Dataset for Visualisation
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(readr)
+Diamonds <- read_csv("C:/Users/nyzyw/OneDrive/Documents/MATH2270 - Data Visualisation/Exercises/Exercise 2/Diamonds.csv")
+Diamonds$cut<- factor(Diamonds$cut, levels=c('Fair','Good','Very Good','Premium','Ideal'), 
+                      ordered=TRUE)
+Diamonds$color <- factor(Diamonds$color, levels=c('J','I','H','G','F','E','D'), 
+                        ordered=TRUE)
+Diamonds$clarity<- factor(Diamonds$clarity, levels=c('I1','SI2','SI1','VS2','VS1','VVS2','VVS1','IF'), 
+                          ordered=TRUE)
+# Group carat into 5 chunks so as to generate a succinct visualisation. 
+Diamonds <- mutate(Diamonds, 
+                   Carat_Group = 
+                     case_when(carat <=1 & carat >0 ~ "Wgt_1",
+                               carat <=2 & carat >1 ~ "Wgt_2",
+                               carat <=3 & carat >2 ~ "Wgt_3",
+                               carat <=4 & carat >3 ~ "Wgt_4",
+                               carat >4 ~ "Wgt_5"))
+# Initial letter of Color Grade
+Diamonds <- mutate(Diamonds, 
+                   Cut_1st_letter = 
+                     case_when(cut == 'Fair' ~ "F",
+                               cut == 'Good' ~ "G",
+                               cut == 'Very Good' ~ "VG",
+                               cut == 'Premium' ~ "P",
+                               cut == 'Ideal' ~ "I"))
+
+Diamonds$Cut_1st_letter <- factor(Diamonds$Cut_1st_letter, levels=c('F','G','VG','P','I'), 
+                                  ordered=TRUE)
+Diamonds
+```
+
+## What determines a diamond's price with one Plot
+
+A combiniation of Weight, Clarity and Cut contribute to price of a diamond. In low weight diamonds - Wgh_1 category, majority of diamond prices are distributed below $5,000. Moving 1 category up to Wgt_2, higher clarity does help contribute to higher prices. Interestingly, when diamonds weigh more than 2 carats, prices appreciate despite of lower clarity bands. In extreme cases such as category Wgt_4 and Wgt_5, i.e. above 3 carats and over, such cases are more so. In short, bigger diamonds normally are accompanied with high end price tags.  
+```{r }
+p <- ggplot(Diamonds, aes(Cut_1st_letter, price)) + geom_violin() 
+p + facet_grid(Carat_Group ~ clarity) + theme_bw()
+```
+
+
